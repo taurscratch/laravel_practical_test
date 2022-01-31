@@ -27502,13 +27502,11 @@ function Index(props) {
       return axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/v1/customers/".concat(response.data.id));
     }).then(function (response) {
       setDate((0,date_fns__WEBPACK_IMPORTED_MODULE_3__["default"])(new Date(response.data.data.dob), 'yyyy-MM-dd'));
-      setAddress(response.data.data.address);
-      response.data.data.gender != null && setGender(response.data.data.gender);
+      setFields(response.data.data.fields);
+      setAddress(response.data.data.address); // response.data.data.gender != null && setGender(response.data.data.gender)
+
       setPhone(response.data.data.phone);
       setEmail(response.data.data.email);
-    });
-    axios__WEBPACK_IMPORTED_MODULE_0___default().get('/api/v1/fields').then(function (response) {
-      setFields(response.data.data);
     });
   }, []);
 
@@ -27519,14 +27517,8 @@ function Index(props) {
     if (type == 'checkbox') {
       var data = _toConsumableArray(fields);
 
-      console.log(data[index].customers[data[index].customers.findIndex(function (x) {
-        return x.id == customerId;
-      })].pivot.view, event.target.checked);
-      data[index].customers[data[index].customers.findIndex(function (x) {
-        return x.id == customerId;
-      })].pivot.view = String(event.target.checked);
+      data[index].pivot.view = String(event.target.checked);
       setFields(data);
-      console.log(fields);
     } else if (type == 'Name') {
       setName(event.target.value);
     } else if (type == 'DOB') {
@@ -27603,9 +27595,7 @@ function Index(props) {
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("center", {
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_mui_material__WEBPACK_IMPORTED_MODULE_10__["default"], {
                 control: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_mui_material__WEBPACK_IMPORTED_MODULE_11__["default"], {
-                  checked: field.customers[field.customers.findIndex(function (x) {
-                    return x.id == customerId;
-                  })].pivot.view == 'true' ? true : false,
+                  checked: field.pivot.view == 'true' ? true : false,
                   onChange: function onChange(e) {
                     return handleChange(e, index, 'checkbox');
                   },
@@ -27618,16 +27608,13 @@ function Index(props) {
             })
           }, field.id);
         }), fields.map(function (field) {
-          return field.customers[field.customers.findIndex(function (x) {
-            return x.id == customerId;
-          })].pivot.view == 'true' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_mui_material__WEBPACK_IMPORTED_MODULE_9__["default"], {
+          return field.pivot.view == 'true' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_mui_material__WEBPACK_IMPORTED_MODULE_9__["default"], {
             item: true,
             xs: 12,
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("center", {
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_mui_material__WEBPACK_IMPORTED_MODULE_12__["default"], {
                 value: field.name == 'Name' ? name : field.name == 'DOB' ? date : field.name == 'Gender' ? gender : field.name == 'Phone Number' ? phone : field.name == "Address" ? address : field.name == "Email" && email,
                 multiline: field.type == 'multiline',
-                select: field.type == 'select',
                 rows: field.type == 'multiline' ? 4 : '',
                 style: {
                   width: "25%"
@@ -27638,6 +27625,7 @@ function Index(props) {
                 onChange: function onChange(e) {
                   return handleChange(e, '', field.name);
                 },
+                select: field.type == 'select',
                 label: field.name,
                 children: field.type == 'select' && genders.map(function (gender) {
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_mui_material__WEBPACK_IMPORTED_MODULE_13__["default"], {

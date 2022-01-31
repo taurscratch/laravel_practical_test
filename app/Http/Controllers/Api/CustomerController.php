@@ -50,7 +50,7 @@ class CustomerController extends Controller
      */
     public function show($id)
     {
-        return new CustomerResource(Customer::findOrFail($id));
+        return new CustomerResource(Customer::with('Fields')->findOrFail($id));
     }
 
     /**
@@ -73,6 +73,12 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->validateWith([
+            'phone' => 'numeric',
+            'dob'   => 'date',
+            'email' => 'email',
+        ]);
+
         try {
             DB::beginTransaction();
             $customer = Customer::find($id);
@@ -86,14 +92,11 @@ class CustomerController extends Controller
 
             $customer_field_array = [];
             foreach ($request->fields as $field) {
-                foreach ($field['customers'] as $customer) {
-                    if ($customer['id'] == $id) {
-                        array_push($customer_field_array, [
-                            'field_id' => $customer['pivot']['field_id'],
-                            'view' => $customer['pivot']['view']
-                        ]);
-                    }
-                }
+
+                array_push($customer_field_array, [
+                    'field_id' => $field['pivot']['field_id'],
+                    'view' => $field['pivot']['view']
+                ]);
             }
 
             $cases = [];
@@ -109,12 +112,14 @@ class CustomerController extends Controller
             }
             $field_ids = implode(',', $field_ids);
             $cases = implode(' ', $cases);
-            DB::update("UPDATE customer_field SET `view` = CASE  {$cases} ELSE `view`  `field_id` in ({$field_ids})");
+            $dml = "UPDATE customer_field SET `view` = CASE  {$cases} ELSE `view` END WHERE  `field_id` in ({$field_ids})";
+            DB::update($dml);
             DB::commit();
             return new CustomerResource($customer);
         } catch (Exception $exception) {
             DB::rollBack();
-            return json_encode(['message'=>""]);
+            var_dump($dml);
+            return response($exception, 500);
         }
     }
 

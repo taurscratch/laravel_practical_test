@@ -30,7 +30,7 @@ class FieldSeeder extends Seeder
                 ],
                 [
                     'name' => 'Gender',
-                    'type'  => 'radio'
+                    'type'  => 'select'
                 ],
                 [
                     'name' => 'Address',

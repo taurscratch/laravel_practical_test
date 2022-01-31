@@ -14,6 +14,15 @@ class CustomerResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'address' => $this->address,
+            'dob' => $this->dob,
+            'email'=> $this->email,
+            'gender' => $this->gender,
+            'id'=> $this->id,
+            'name' => $this->name,
+            'phone' => $this->phone,
+            'fields' => $this->Fields
+        ];
     }
 }

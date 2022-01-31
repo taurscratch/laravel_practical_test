@@ -29,14 +29,11 @@ export default function Index(props) {
             return axios.get(`/api/v1/customers/${response.data.id}`)
         }).then(response => {
             setDate(format(new Date(response.data.data.dob), 'yyyy-MM-dd'))
+            setFields(response.data.data.fields)
             setAddress(response.data.data.address)
-            response.data.data.gender != null && setGender(response.data.data.gender)
+            // response.data.data.gender != null && setGender(response.data.data.gender)
             setPhone(response.data.data.phone)
             setEmail(response.data.data.email)
-        })
-
-        axios.get('/api/v1/fields').then(response => {
-            setFields(response.data.data)
         })
 
 
@@ -45,10 +42,8 @@ export default function Index(props) {
     const handleChange = (event, index = 0, type) => {
         if (type == 'checkbox') {
             let data = [...fields];
-            console.log( data[index].customers[data[index].customers.findIndex(x=>x.id==customerId)].pivot.view,event.target.checked)
-            data[index].customers[data[index].customers.findIndex(x=>x.id==customerId)].pivot.view = String(event.target.checked)
+            data[index].pivot.view = String(event.target.checked)
             setFields(data)
-            console.log(fields)
         }
         else if (type == 'Name') {
             setName(event.target.value)
@@ -118,7 +113,7 @@ export default function Index(props) {
                             <center>
                                 <FormControlLabel control={
                                     <Checkbox
-                                        checked={field.customers[field.customers.findIndex(x=>x.id==customerId)].pivot.view == 'true' ? true : false}
+                                        checked={field.pivot.view == 'true' ? true : false}
                                         onChange={(e) => handleChange(e, index, 'checkbox')}
                                         inputProps={{ 'aria-label': 'controlled' }} />}
                                     label={field.name} />
@@ -128,7 +123,7 @@ export default function Index(props) {
                     )}
                     {fields.map(field =>
                     (
-                        field.customers[field.customers.findIndex(x=>x.id==customerId)].pivot.view == 'true' &&
+                        field.pivot.view == 'true' &&
                         <Grid item xs={12} key={field.id}>
                             <center>
                                 <TextField
@@ -141,13 +136,13 @@ export default function Index(props) {
                                                             field.name == "Email" && email
                                     }
                                     multiline={field.type == 'multiline'}
-                                    select={field.type == 'select'}
                                     rows={field.type == 'multiline' ? 4 : ''}
                                     style={{ width: "25%" }}
                                     type={field.type}
                                     variant="outlined"
                                     margin="normal"
                                     onChange={(e) => handleChange(e, '', field.name)}
+                                    select={field.type == 'select'}
                                     label={field.name} >
                                     {field.type == 'select' && genders.map(gender => (
                                         <MenuItem value={gender} key={gender}>
