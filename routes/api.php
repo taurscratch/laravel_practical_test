@@ -18,9 +18,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['prefix' => 'v1', 'middleware' => ['auth:sanctum']], function () {
+
+Route::prefix('v1')->middleware('auth')->group(function () {
     Route::apiResource('fields', 'Api\FieldController');
 
     Route::apiResource('customers', 'Api\CustomerController');
 });
+
 Route::post('/tokens/create', 'UserController@issueToken');

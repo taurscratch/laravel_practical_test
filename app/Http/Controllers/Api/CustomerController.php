@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CustomerResource;
+use App\Mail\SubmissionReceived;
 use App\Models\Customer;
+use App\Providers\CustomerSubmitted;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class CustomerController extends Controller
 {
@@ -115,10 +118,10 @@ class CustomerController extends Controller
             $dml = "UPDATE customer_field SET `view` = CASE  {$cases} ELSE `view` END WHERE  `field_id` in ({$field_ids})";
             DB::update($dml);
             DB::commit();
+            CustomerSubmitted::dispatch($customer);
             return new CustomerResource($customer);
         } catch (Exception $exception) {
             DB::rollBack();
-            var_dump($dml);
             return response($exception, 500);
         }
     }
